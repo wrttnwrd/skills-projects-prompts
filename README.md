@@ -1,2 +1,4 @@
 # Prompts
- My favorite AI prompts
+AI prompts I've used, played with, or tested.
+
+Your mileage may vary.

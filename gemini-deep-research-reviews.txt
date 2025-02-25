@@ -1,0 +1,1 @@
+Please gather 20 reviews for Starter Villain, a book by John Scalzi. Then, on a scale of 0-10, 0 being most negative, 10 being most positive, give me the average sentiment of those reviews. Please provide the output in a table that includes a relevant quote from the review, the sentiment rating, a link to the review, and a summary of the review.

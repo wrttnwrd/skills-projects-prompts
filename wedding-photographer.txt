@@ -1,0 +1,24 @@
+Generate an outline for a blog post about choosing a wedding photographer.
+
+Please provide four or five of the most important criteria they should use when selecting a photographer. Included among those should be whether the photographer uses film or digital, and whether they make photos available online.
+
+My readers are first time brides and grooms. They are excited but stressed, and they want the day to go perfectly. They have never chosen a photographer for any event, including weddings. They have no more than 3-5 minutes to read the article.
+
+The post will include five recommended photographers that I will add. Each photographer will include a landscape-formatted image and should include the information you've chosen as the most important selection criteria.
+
+Please generate an outline that shows me:
+
+An example intro of no more than 2 sentences plus the selection criteria
+
+An example conclusion of no more than 2 sentences.
+
+Your four or five top selection criteria
+
+Where you would put the photographer profiles
+
+How you would present the selection criteria with each profile
+
+Please provide the outline in rich text format that I can paste into a Google Doc.
+
+Please provide the outline in the same order I’ll use in the final document.
+
