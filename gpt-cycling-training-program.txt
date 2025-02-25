@@ -1,0 +1,7 @@
+I am 56 years old. I weigh 178 pounds, have a vo2 max of 46, an ftp of 230, and I am a cyclist. Please design a four week exercise program to help me increase my overall strength, improve my FTP, increase my vo2 max, and avoid burnout. Where possible, use sufferfest cycling workouts as examples.
+
+I have a full set of dumbbells and a pull-up bar.
+
+I'd like to ride 8-10 hours/week. 
+
+Please provide the schedule in a CSV format I can import into Todoist. 
