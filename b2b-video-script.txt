@@ -1,0 +1,21 @@
+Generate a first draft script for a video about choosing the right security software for your mid-sized services firm. I'm going to use this draft to write a final script, which I will narrate and record. I will create visuals to accompany the narration.
+
+This script should focus on cybersecurity software. Please make sure the script reflects that.
+
+Please provide 10 of the most important criteria they should use when selecting security software. Included among those should be whether the software is installed by third-party consultants, or you have to install it yourself, whether it requires and IT team, and whether it includes AI.
+
+My listeners are managers and knowledge workers. They've been given the task of finding three or four options for security software. Their boss is the CEO. They work in a firm of 10-50 people.
+
+My listeners are not security professionals. Nor are their bosses. They don't understand most digital security terms or acronyms. They need the criteria to make sense in plain language.
+
+Do NOT include specific software. Just the criteria. 
+
+Please generate an outline that shows me the ten criteria, fictional examples of software that meets or does not meet each criteria, prioritization of the criteria, and 5 possible experts I could interview for the video. These experts should have demonstrated, real-world experience in b2b digital security. 
+
+Please provide the outline in plain text.
+
+Please provide the outline in the same order I’ll use in the video script.
+
+The video should be between 5 and 10 minutes long.
+
+Please make sure the script is written at a reading level similar to the New York Times. Avoid passive voice. Keep the tone informal.
