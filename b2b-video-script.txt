@@ -19,3 +19,5 @@ Please provide the outline in the same order I’ll use in the video script.
 The video should be between 5 and 10 minutes long.
 
 Please make sure the script is written at a reading level similar to the New York Times. Avoid passive voice. Keep the tone informal.
+
+Please show Video/SOT, Narration, and graphics/videos and timecode
