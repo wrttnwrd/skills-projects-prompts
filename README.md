@@ -1,6 +1,6 @@
 # Prompts And Skills
 
-## Root folder
+## Prompts folder
 
 AI prompts I've used, played with, or tested.
 
