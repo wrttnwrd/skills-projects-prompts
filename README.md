@@ -8,4 +8,4 @@ Your mileage may vary.
 
 ## Skills Folder
 
-Collection of Claude skills
+Collection of Claude skills. Again with the mileage thing.
