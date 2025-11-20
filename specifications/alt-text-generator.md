@@ -1,6 +1,6 @@
 # alt text generator specifications
 
-[//]: # (Hey, humans: I'm not a developer. I'm sure you can write a better. But feed this into Claude Code and you'll have a solid start on your very own ALT text generator.)
+[//]: # (Hey, humans: I'm not a developer. I'm sure you can write a better spec. But feed this into Claude Code and you'll have a solid start on your very own ALT text generator.)
 
 
 ## Purpose
