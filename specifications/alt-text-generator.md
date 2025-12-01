@@ -1,7 +1,8 @@
 # alt text generator specifications
 
-[//]: # (Hey, humans: I'm not a developer. I'm sure you can write a better spec. But feed this into Claude Code and you'll have a solid start on your very own ALT text generator.)
+[//]: # (Written by Ian Lurie, November 2025, but use at your own risk. I'm not responsible for API overspending, lousy ALt text, or accidental missile launches. If you've got questions, though, find me at ianlurie.com or on LinkedIn at https://www.linkedin.com/in/ianlurie/)
 
+[//]: # (Hey, humans: I'm not a developer. I'm sure you can write a better spec. But feed this into Claude Code and you'll have a solid start on your very own ALT text generator.)
 
 ## Purpose
 
