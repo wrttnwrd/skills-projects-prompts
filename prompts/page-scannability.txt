@@ -1,0 +1,4 @@
+I have a page on my site where most folks aren't scrolling all the way to the end. I want to make this page easier to scan. Please load the page, inspect it, then make recommendations. Provide a mockup showing me how it'd look if I implemented those recommendations.
+
+Stick with the CSS I use on my current site. That may mean smaller improvements. I can *add* to the CSS. But I want to make sure the new page fits the overall style.
+
