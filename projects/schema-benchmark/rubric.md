@@ -10,10 +10,25 @@ Each fixture is scored out of 100. The overall benchmark score is the mean acros
 | 2 | Required nested types present | 15 | Every type in `gold.must_include_nested` appears somewhere in the output (top-level or nested) |
 | 3 | No forbidden types | 15 | No type in `gold.forbidden_types` appears anywhere in the output |
 | 4 | Required properties present | 10 | Every property in `gold.must_have_properties` appears on the primary entity, or on a nested entity that logically owns it (e.g. `address` on a nested `PostalAddress`) |
-| 5 | Topical signals | 5 | If `gold.must_have_topical_signals` is true, `about` or `mentions` appears on the primary entity with at least one named subject. If false, full credit automatically. |
+| 5 | Topical signals | 5 | If `gold.must_have_topical_signals` is true, the primary entity carries topical signals using the right schema.org property for its type family (see table below) with at least one named subject. If false, full credit automatically. |
 | 6 | Validator clean | 10 | `validator.schema.org` reports zero errors. Warnings do not count against this criterion. |
 | 7 | No invented properties | 5 | Spot-check three less-common properties used in the output against schema.org. Skip `name`, `url`, `description`, `@type`, `@id`, `@context`. All three must exist on the type they're used on. |
 | 8 | Proper nesting | 10 | All three sub-checks pass (see below). |
+
+### Criterion 5 — Topical signals (detail)
+
+`about` is not valid on every type, so the property that satisfies criterion 5 depends on the primary entity's type family:
+
+| Primary entity family | Property that satisfies criterion 5 |
+|---|---|
+| `CreativeWork` subtypes (`Article`, `BlogPosting`, `NewsArticle`, `WebPage`, `FAQPage`, `HowTo`, `Recipe`, `VideoObject`, etc.) | `about` and/or `mentions` |
+| `Organization` family (`Organization`, `LocalBusiness` and subtypes, `Corporation`, `EducationalOrganization`, etc.) | `knowsAbout` |
+| `Service` / `ProfessionalService` | `serviceType` plus `category` and/or `audience` |
+| `Product` / `SoftwareApplication` | `category` and/or `keywords` (rarely required — usually `must_have_topical_signals: false` here) |
+| `Person` | `knowsAbout` |
+| `Event` | `about` |
+
+The signal must be on the **primary** entity. Topics on a sibling `WebPage` only do not satisfy this criterion — that's the failure mode the criterion was designed to catch.
 
 ### Criterion 8 — Proper nesting (detail)
 

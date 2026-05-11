@@ -89,11 +89,13 @@ Before delivering, work through every item. Write out the answer to each — do 
 
 **Structure & nesting**
 
+- [ ] **If I used `@graph`, can I name the specific reason** (shared site-identity entity that needs an `@id`, or a real cross-reference)? If not, collapse to a single root with inline nesting.
+- [ ] **No `WebPage` wrapper added just to host the page.** If I have a `WebPage` at the top level, it's there because something other than the primary needs to reference it — otherwise delete it and move its properties (`about`, `mainEntity`) onto the primary.
 - [ ] The primary entity is at the root, or is the first non-anchor entity inside `@graph`.
+- [ ] **Orphan walk**: for every non-primary top-level entity that is not a recognized site-wide anchor (`WebSite` or site-identity `Organization`), I can trace an `@id` reference *from the primary's property tree* to it. Being pointed *at* by `WebPage.mainEntity` or similar does NOT count.
 - [ ] Every natural-secondary-entity relationship that's present (`author`, `publisher`, `brand`, `offers`, `address`, `contactPoint`, `aggregateRating`, `review`, `performer`, `hiringOrganization`, etc.) is either an inline nested object **or** an `@id` reference to another entity in the same `@graph`. Never a bare string.
-- [ ] No entity sits as a standalone top-level block without an `@id` link from the primary entity, unless it's a recognized site-wide anchor (`WebSite`, site-identity `Organization`).
 - [ ] Repeated entities are defined once and referenced via `@id`, not duplicated inline.
-- [ ] Topical signals are present — `about` and/or `mentions` referencing the page's main subjects.
+- [ ] Topical signals are present **on the primary entity**, using the right property for its type family (`about`/`mentions` for `CreativeWork` subtypes, `knowsAbout` for `Organization`/`Person`, `serviceType`+`category`+`audience` for `Service`, `category`/`keywords` for `Product`/`SoftwareApplication`, `about` for `Event`). Topics on a sibling `WebPage` only do not count.
 - [ ] If this is the homepage, full `Organization` (or `LocalBusiness` / `Corporation`) detail is present.
 
 **The nesting test**: for every top-level entity besides the primary, can you trace an `@id` reference path from the primary entity to it? If no, nest it inline as a property value instead.
@@ -231,7 +233,20 @@ Do not produce any of these. They are the most common type-misuse errors:
 
 3. **Most specific applicable type.** `Dentist` beats `LocalBusiness` beats `Organization`. `BlogPosting` beats `Article`. Generic types are a last resort.
 
-4. **Topical signals for knowledge graph and LLM visibility.** Always include `about` and/or `mentions` referencing the main subjects of the page. This is what makes the schema useful beyond Google rich results — it's how the page becomes legible to knowledge graphs and LLMs.
+4. **Topical signals for knowledge graph and LLM visibility.** Always attach topical signals **to the primary entity** referencing the main subjects of the page — never only to a sibling `WebPage`. This is what makes the schema useful beyond Google rich results — it's how the page becomes legible to knowledge graphs and LLMs.
+
+   The correct property depends on the primary type family, because `about` / `mentions` are only valid on `CreativeWork` subtypes:
+
+   | Primary entity family | Use property |
+   |---|---|
+   | `CreativeWork` subtypes (`Article`, `BlogPosting`, `NewsArticle`, `WebPage`, `FAQPage`, `HowTo`, `Recipe`, `VideoObject`, etc.) | `about` and/or `mentions` |
+   | `Organization` family (`Organization`, `LocalBusiness` and subtypes, `Corporation`, `EducationalOrganization`, etc.) | `knowsAbout` |
+   | `Service` / `ProfessionalService` | `serviceType` (primary topic) plus `category` and/or `audience` for secondary topics |
+   | `Product` / `SoftwareApplication` | `category` and/or `keywords` (topical signals are optional here — the product is the subject) |
+   | `Person` | `knowsAbout` |
+   | `Event` | `about` |
+
+   If you find yourself wanting to put `about` on an `Organization` or `Service`, stop — that property doesn't exist on those types. Use the row above instead.
 
 5. **Page-truth only.** Only include data that actually appears on the page. Don't fabricate, infer, or pull from outside sources unless the user explicitly approves.
 
@@ -241,9 +256,11 @@ Do not produce any of these. They are the most common type-misuse errors:
 
 # Proper nesting
 
-The gold standard for output is hierarchical: one primary entity, with related entities nested as property values inside it. Multiple flat top-level blocks — what many plugins emit — is a structural mistake even when the JSON validates.
+The gold standard is hierarchical: **one primary entity at the root, with related entities nested as property values inside it.** Multiple flat top-level blocks — what many plugins emit — is a structural mistake even when the JSON validates.
 
-## Inline nesting (the default)
+## Inline nesting is the default — `@graph` is the exception
+
+Default to a single root object. Only reach for `@graph` if you have a concrete reason from the next section. **Adding a wrapper `WebPage` (or any other ancillary entity) at the top level just because "it's the page" is not a reason** — it produces a flat sibling that nothing references and inflates the orphan count.
 
 The primary entity owns its relationships as inline nested objects:
 
@@ -267,12 +284,38 @@ The `Person` and `Organization` are property values of the `BlogPosting`, not to
 
 ## When `@graph` is appropriate
 
-`@graph` is correct when:
+`@graph` is correct **only** when one of these is true:
 
-- A site-wide entity (`Organization` for site identity, `WebSite` for the site itself) is referenced from multiple pages. Define it once with an `@id`, reference it elsewhere via `{"@id": "..."}`.
-- Two entities have a genuine cross-reference that nesting cannot express cleanly.
+- A site-wide entity (`Organization` for site identity, `WebSite` for the site itself) is genuinely shared across pages and needs an `@id` so other pages can reference it.
+- Two entities have a real cross-reference (each property-points at the other) that nesting cannot express cleanly.
 
-When using `@graph`, every non-primary entity must be linked from the primary via `@id`. An entity in `@graph` that nothing else points to is a floating orphan, which is the structural mistake nesting was supposed to fix.
+If you cannot point to one of those reasons, do not use `@graph`. Specifically:
+
+- Do not add a top-level `WebPage` just to host `about` / `mainEntity` — put `about` on the primary entity (see Core Principle 4) and omit the `WebPage` wrapper.
+- Do not promote a child entity (`SoftwareApplication` under an `Organization`, `Service` under a `Provider`, etc.) into a graph sibling. Nest it inline as a property value instead.
+
+## Rules for `@graph` when you do use it
+
+If you commit to `@graph`, every non-primary entity must be either:
+
+1. A recognized **site-wide anchor** — a standalone `WebSite`, or a site-identity `Organization` that exists only to be `@id`-referenced. Anchors may precede the primary in the array.
+2. **Forward-referenced from the primary** via an `@id` somewhere in the primary's property tree. The primary must point at it — being pointed *at* (e.g., `WebPage.mainEntity` → primary) does **not** count as anchoring.
+
+Run this test before delivering: walk the primary entity and collect every `{"@id": "..."}` reference. Every non-anchor top-level entity's `@id` must appear in that set. If one doesn't, it's a floating orphan — either inline-nest it or delete it.
+
+### Quick reference: which property carries the forward link
+
+When the primary needs to forward-reference a sibling in `@graph`, use a property that's valid on the primary's type:
+
+| From primary | To sibling | Use property |
+|---|---|---|
+| Any `CreativeWork` subtype | site-identity `Organization` | `publisher` |
+| Any `CreativeWork` subtype | site `WebSite` | `isPartOf` |
+| `Article` / `BlogPosting` | author `Person` | `author` |
+| `Product` / `SoftwareApplication` | brand `Organization` | `brand` |
+| `Service` | provider `Organization` | `provider` |
+| `Organization` / `LocalBusiness` | products or software offered | `makesOffer` (with nested `Offer.itemOffered`) or inline `Product` / `SoftwareApplication` — not a peer in `@graph` |
+| Any primary | containing `WebPage` | usually unnecessary — drop the `WebPage` instead |
 
 ## Anti-patterns
 
