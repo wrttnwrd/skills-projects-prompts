@@ -38,7 +38,7 @@ Prompt template for each subagent:
 
 For each subagent return, evaluate against the fixture's gold per `rubric.md`. Parse the JSON-LD from inside the `<script>` tags first.
 
-- **Criterion 1 — Primary type correctness (40 pts)**: Find the primary type. If the output is a single object, it's the top-level `@type`. If the output uses `@graph`, the primary type is the first non-boilerplate entity (skip standalone `WebSite` / `Organization` that exist only to anchor `@id` references). Does it appear in `gold.primary_type_options`? Award 40 or 0.
+- **Criterion 1 — Primary type correctness (30 pts)**: Find the primary type. If the output is a single object, it's the top-level `@type`. If the output uses `@graph`, the primary type is the first non-boilerplate entity (skip standalone `WebSite` / `Organization` that exist only to anchor `@id` references). Does it appear in `gold.primary_type_options`? Award 30 or 0.
 
 - **Criterion 2 — Required nested types (15 pts)**: Walk every node in the output and collect every `@type` value (including nested). Does every type in `gold.must_include_nested` appear in that set? Award 15 or 0.
 
@@ -51,6 +51,16 @@ For each subagent return, evaluate against the fixture's gold per `rubric.md`. P
 - **Criterion 6 — Validator clean (10 pts)**: Read the subagent's `VALIDATOR:` line. `clean` = 10, `errors` = 0, `unreachable` = N/A (re-normalize this fixture's score).
 
 - **Criterion 7 — No invented properties (5 pts)**: Pick three less-common properties used in the output (skip `name`, `url`, `description`, `@type`, `@id`, `@context`, `headline`, `image`). Fetch `https://schema.org/<TypeName>` for the type each property is used on, and confirm the property is listed. All three must exist for full credit; one invented = 0. If fewer than three less-common properties exist, check all of them.
+
+- **Criterion 8 — Proper nesting (10 pts)**: Run all three sub-checks. Award 10 only if all pass; otherwise 0.
+
+  1. **Primary at the root**: the primary entity (the one scored in criterion 1) is at the JSON root or is the first non-anchor entity inside `@graph`. Anchors that may precede it: a standalone `WebSite` or a site-identity `Organization` that exists only to be referenced by `@id`.
+
+  2. **No orphans**: collect every top-level entity (either the root object alone, or every entry inside `@graph`). For each one that is NOT the primary, check that it is either (a) a recognized site-wide anchor (`WebSite`, or `Organization` not described by the page's primary purpose), OR (b) referenced from the primary entity via an `@id` somewhere in its property tree. Walk the primary entity recursively and collect all `@id` strings found in `{"@id": "..."}` reference objects. Any non-primary, non-anchor top-level entity whose `@id` isn't in that set is an orphan — fail.
+
+  3. **Typed relationships, not bare strings**: for each of these properties found on the primary entity — `author`, `publisher`, `brand`, `offers`, `address`, `contactPoint`, `aggregateRating`, `review`, `performer`, `hiringOrganization`, `provider`, `location` — confirm the value is an object (with `@type` or `@id`) or an array of objects. If any is a bare string, fail.
+
+  Record which sub-check failed in the per-fixture notes so the report can identify the pattern.
 
 Compute the fixture score: `(sum of awarded points / total possible) × 100`. Re-normalize if any criterion was N/A.
 
@@ -87,6 +97,7 @@ Write to `results/YYYY-MM-DD-HHMM.md` using local time. Use this structure:
 | 5. Topical signals | 5/6 (83%) |
 | 6. Validator clean | 6/6 (100%) |
 | 7. No invented properties | 4/6 (67%) |
+| 8. Proper nesting | 5/6 (83%) |
 
 ## Notable failures
 

@@ -87,12 +87,16 @@ Before delivering, work through every item. Write out the answer to each — do 
 - [ ] No `Recipe` unless the page is an actual recipe with ingredients and instructions.
 - [ ] No `Event` unless there is a specific dated occurrence (not an evergreen page about events generally).
 
-**Structure**
+**Structure & nesting**
 
-- [ ] Schema is nested rather than split into many flat top-level blocks.
+- [ ] The primary entity is at the root, or is the first non-anchor entity inside `@graph`.
+- [ ] Every natural-secondary-entity relationship that's present (`author`, `publisher`, `brand`, `offers`, `address`, `contactPoint`, `aggregateRating`, `review`, `performer`, `hiringOrganization`, etc.) is either an inline nested object **or** an `@id` reference to another entity in the same `@graph`. Never a bare string.
+- [ ] No entity sits as a standalone top-level block without an `@id` link from the primary entity, unless it's a recognized site-wide anchor (`WebSite`, site-identity `Organization`).
+- [ ] Repeated entities are defined once and referenced via `@id`, not duplicated inline.
 - [ ] Topical signals are present — `about` and/or `mentions` referencing the page's main subjects.
-- [ ] Repeated entities are tied together with `@id` references rather than duplicated.
 - [ ] If this is the homepage, full `Organization` (or `LocalBusiness` / `Corporation`) detail is present.
+
+**The nesting test**: for every top-level entity besides the primary, can you trace an `@id` reference path from the primary entity to it? If no, nest it inline as a property value instead.
 
 **Data formatting**
 
@@ -234,6 +238,80 @@ Do not produce any of these. They are the most common type-misuse errors:
 6. **Homepage rule.** Unless told otherwise, assume the site's homepage gets the full `Organization` (or `LocalBusiness` / `Corporation`) schema — name, url, logo, sameAs (social profiles), contactPoint, address, founder, foundingDate, etc., as available.
 
 7. **Reference, don't duplicate.** When the same entity appears in multiple places, define it once with an `@id` and reference it elsewhere.
+
+# Proper nesting
+
+The gold standard for output is hierarchical: one primary entity, with related entities nested as property values inside it. Multiple flat top-level blocks — what many plugins emit — is a structural mistake even when the JSON validates.
+
+## Inline nesting (the default)
+
+The primary entity owns its relationships as inline nested objects:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "...",
+  "author": {
+    "@type": "Person",
+    "name": "Sarah Chen"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Acme Cloud"
+  }
+}
+```
+
+The `Person` and `Organization` are property values of the `BlogPosting`, not top-level siblings.
+
+## When `@graph` is appropriate
+
+`@graph` is correct when:
+
+- A site-wide entity (`Organization` for site identity, `WebSite` for the site itself) is referenced from multiple pages. Define it once with an `@id`, reference it elsewhere via `{"@id": "..."}`.
+- Two entities have a genuine cross-reference that nesting cannot express cleanly.
+
+When using `@graph`, every non-primary entity must be linked from the primary via `@id`. An entity in `@graph` that nothing else points to is a floating orphan, which is the structural mistake nesting was supposed to fix.
+
+## Anti-patterns
+
+Three separate top-level blocks with no `@id` linkage:
+
+```json
+[
+  { "@context": "...", "@type": "Article", "headline": "..." },
+  { "@context": "...", "@type": "Person", "name": "Sarah Chen" },
+  { "@context": "...", "@type": "Organization", "name": "Acme Cloud" }
+]
+```
+
+The `Article` has no `author` or `publisher` property pointing to the `Person` or `Organization`. They float untethered. This is flat schema with extra steps.
+
+A single `@graph` with the same problem:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "Article", "headline": "..." },
+    { "@type": "Person", "name": "Sarah Chen" }
+  ]
+}
+```
+
+Still wrong — the `Article` has no `author` linking to the `Person`. Either inline-nest the `Person` as `author`, or give the `Person` an `@id` and reference it from `author`.
+
+A bare string where a typed entity belongs:
+
+```json
+{
+  "@type": "BlogPosting",
+  "author": "Sarah Chen"
+}
+```
+
+Lossy. Use `{"@type": "Person", "name": "Sarah Chen"}` so the relationship is typed.
 
 # Common types overview
 
