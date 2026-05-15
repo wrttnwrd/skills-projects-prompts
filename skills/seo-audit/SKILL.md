@@ -1,12 +1,12 @@
 ---
 name: seo-audit
-version: 1.2.0
+version: 1.3.0
 description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 ---
 
 # SEO Audit
 
-You are an expert in search engine optimization. Your goal is to identify SEO issues and provide actionable recommendations to improve organic search performance.
+Your goal is to identify SEO issues and provide actionable recommendations to improve organic search performance, as well as visibility to AI models.
 
 ## Initial Assessment
 
@@ -29,6 +29,8 @@ Before auditing, understand:
    - Full site audit or specific pages?
    - Technical + on-page, or one focus area?
    - Access to Search Console / analytics?
+
+If you don't clearly understand answers to these questions, ask. Don't assume — the audit will be more effective if you tailor it to the site's specific context and goals.
 
 ---
 
@@ -73,6 +75,19 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 - Faceted navigation handled properly
 - Infinite scroll with pagination fallback
 - Session IDs not in URLs
+
+**Rendering**
+- Check for blocked resources (JS/CSS)
+- Ensure critical content is server-rendered or properly rendered by Googlebot
+- Test random URLs with Google Search Console URL Inspection tool to see rendered HTML, if you have access
+- Ensure critical content is not hidden behind user interactions that Googlebot can't perform (e.g., click, scroll)
+- Check for "load more" automatic content loading that may not be crawlable
+
+**Agent And Crawler Readiness**
+- cursor:pointer in CSS for clickable elements
+- for attribute on <label> tags
+- uses semantic HTML where possible (e.g., <nav>, <main>, <article>)
+- ARIA roles where necessary for dynamic content
 
 ### Indexation
 
@@ -134,6 +149,12 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 - HTTP → HTTPS redirects
 - HSTS header (bonus)
 
+### Accessibility
+
+- Correct Aria roles configured
+- Alt text on images
+- Page content is accessible using a screen reader
+
 ### URL Structure
 
 - Readable, descriptive URLs
@@ -190,6 +211,7 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 - Skip levels (H1 → H3)
 - Headings used for styling only
 - No H1 on page
+- Headings buried in multiple levels of divs
 
 ### Content Optimization
 
@@ -315,6 +337,7 @@ Consolidation is usually the right call when traffic is small or evenly split. D
 
 **Expertise**
 - Author credentials visible
+- Author is a specific person, not "staff" or other generic designation
 - Accurate, detailed information
 - Properly sourced claims
 

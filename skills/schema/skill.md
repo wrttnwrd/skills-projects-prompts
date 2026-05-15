@@ -1,6 +1,6 @@
 ---
 name: schema-json-ld
-description: Generate, self-review, and validate JSON-LD schema markup for web pages. Enforces schema.org compliance through a mandatory workflow with type selection, verification against schema.org, self-review, revision, and a validator pass before delivery.
+description: Generate and self-review JSON-LD schema markup for web pages. Enforces schema.org compliance through a mandatory workflow with type selection, verification against schema.org, self-review, and revision before delivery.
 ---
 
 # When to use this skill
@@ -19,8 +19,7 @@ Steps:
 4. Generate
 5. Self-review against the checklist
 6. Revise
-7. Validate
-8. Deliver
+7. Deliver
 
 ## Step 1 — Analyze the page
 
@@ -116,23 +115,13 @@ For each issue found in Step 5, fix it. If a fix requires re-verifying a type or
 
 After revising, run Step 5 again on the changed portions. Stop iterating only when every box can be ticked honestly.
 
-## Step 7 — Validate
-
-Submit the generated JSON-LD to `https://validator.schema.org/`. Use WebFetch with the JSON in the payload, or Playwright if the page needs a JS-driven flow. Read the errors and warnings:
-
-- **Errors**: must be fixed. Return to Step 6.
-- **Warnings about missing recommended properties**: fix if the data is available on the page; otherwise note them to the user as opportunities for richer markup.
-- **Warnings you do not recognize**: do not ignore. Look up the property on schema.org.
-
-If you cannot reach the validator for any reason, say so explicitly when delivering and recommend the user run it.
-
-## Step 8 — Deliver
+## Step 7 — Deliver
 
 Present the final schema in the agreed output format (see Output Format below). Include a short note covering:
 
 - The primary type chosen and why.
 - Any required properties that were unavailable on the page and therefore omitted.
-- The validator result — clean, or a list of remaining warnings the user should be aware of.
+- A recommendation that the user paste the schema into `https://validator.schema.org/` and `https://search.google.com/test/rich-results` to confirm it validates cleanly — these tools block automated requests, so the user needs to run them.
 
 # Type selection reference
 
@@ -536,10 +525,10 @@ Always wrap the final schema in `<script type="application/ld+json">` tags so it
 
 For multiple related schemas, prefer one `@graph` block inside a single script tag over multiple script tags.
 
-# Validation tools
+# Validation tools (for the user to run)
 
-The skill requires that you (the agent) run validation in Step 7. Tools:
+These tools block automated requests, so recommend them to the user rather than attempting to call them yourself:
 
-- **Schema Markup Validator** — `https://validator.schema.org/` — the canonical schema.org validator. Use this in Step 7.
-- **Google Rich Results Test** — `https://search.google.com/test/rich-results` — recommend to the user for Google-specific rich-result eligibility.
+- **Schema Markup Validator** — `https://validator.schema.org/` — the canonical schema.org validator.
+- **Google Rich Results Test** — `https://search.google.com/test/rich-results` — for Google-specific rich-result eligibility.
 - **JSON-LD Playground** — `https://json-ld.org/playground/` — useful for debugging unusual graph structures.
