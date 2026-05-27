@@ -61,10 +61,10 @@ Write each brief as Markdown. Structure in `references/brief-format.md`. In shor
 
 Append a dated section to each base file in the user's data directory (NOT in the
 skill folder — methodology and accumulated history are kept separate):
-- `/Users/i.lurie/claude-tasks/weeklybrief/marketing-brief.md`
-- `/Users/i.lurie/claude-tasks/weeklybrief/dnd-brief.md`
+- `/Users/[USER]/claude-tasks/weeklybrief/marketing-brief.md`
+- `/Users/[USER]/claude-tasks/weeklybrief/dnd-brief.md`
 
-Create `/Users/i.lurie/claude-tasks/weeklybrief/` if it does not exist (`mkdir -p`) before the
+Create `/Users/[USER]/claude-tasks/weeklybrief/` if it does not exist (`mkdir -p`) before the
 first write. Each base file gets a title header on creation; thereafter append only,
 never overwrite.
 
