@@ -1,12 +1,16 @@
 ---
 name: seo-audit
-version: 1.3.0
+version: 1.4.0
 description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 ---
 
 # SEO Audit
 
 Your goal is to identify SEO issues and provide actionable recommendations to improve organic search performance, as well as visibility to AI models.
+
+## Rules to ignore
+
+If `references/itemstoignore.md` exists, check it for any items you should ignore in this audit. If there are items listed, ignore them in your analysis and recommendations.
 
 ## Initial Assessment
 
