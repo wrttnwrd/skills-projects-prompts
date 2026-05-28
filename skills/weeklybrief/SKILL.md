@@ -61,6 +61,7 @@ Roster is **hybrid**: start from a maintained client list if one exists, and als
 - For each marketing cluster, flag a client only when there is a **genuine, specific** connection — story → client → why, citing the meeting title and date. No speculative or generic matches ("they do marketing too" is not a match).
 - Surface any client found in Otter but not on the list as a **"new client?"** suggestion to add to `client-list.md`.
 - If nothing connects this week, record that explicitly rather than padding.
+- If Otter is unavailable (e.g. connector errors/timeouts after a retry), do **not** silently skip this step — write "Otter unavailable this week — client matches not checked" in the "Pass along to clients" section so the gap is visible.
 
 ### 5. Emit two briefs
 
