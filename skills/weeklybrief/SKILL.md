@@ -1,12 +1,12 @@
 ---
 name: weeklybrief
 version: 1.0.0
-description: When the user wants their weekly reading digest from Readwise Reader — staying on top of new developments in marketing/SEO/AI and in Dungeons & Dragons. Triggers include "run my weekly brief," "industry brief," "what did I miss this week," "catch me up on my feeds," or "weekly digest." Produces two separate briefs (marketing and D&D) from one Reader pull and appends structured records to two running Markdown base files.
+description: When the user wants their weekly reading digest from Readwise Reader — staying on top of new developments in marketing/SEO/AI and in Dungeons & Dragons. Triggers include "run my weekly brief," "industry brief," "what did I miss this week," "catch me up on my feeds," or "weekly digest." Produces two separate briefs (marketing and D&D) from one Reader pull and writes each to its own dated Markdown file.
 ---
 
 # Weekly Brief
 
-Generate two weekly synthesis briefs from the user's Readwise Reader — one for **marketing** (SEO, content strategy, AI-in-marketing, agentic tooling) and one for **Dungeons & Dragons** — in a single pass, and append structured records to two running base files so the user accumulates a queryable history.
+Generate two weekly synthesis briefs from the user's Readwise Reader — one for **marketing** (SEO, content strategy, AI-in-marketing, agentic tooling) and one for **Dungeons & Dragons** — in a single pass, and write each brief to its own dated file so the user accumulates a queryable history.
 
 The goal is not to list what the user saved. It is to **triage and synthesize**: collapse the same story told by many sources into one entry, surface what genuinely matters, and connect it to the user's work. The user already captures plenty; what's missing is something that reads across all of it and says "here are the few things that matter, here's why."
 
@@ -70,27 +70,26 @@ Write each brief as Markdown. Structure in `references/brief-format.md`. In shor
 - **D&D:** "N solid pieces this week, here's what each gives you," Praxia-relevant pieces first.
 - If a section is empty this week, say so briefly rather than padding.
 
-### 6. Append to the two base files
+### 6. Write the two dated brief files
 
-Append a dated section to each base file in the user's data directory (NOT in the
-skill folder — methodology and accumulated history are kept separate):
-- `/Users/i.lurie/claude-tasks/weeklybrief/marketing-brief.md`
-- `/Users/i.lurie/claude-tasks/weeklybrief/dnd-brief.md`
+Write each brief to its own dated file in the user's data directory (NOT in the
+skill folder — methodology and accumulated history are kept separate). One file per
+brief per week, named by the brief's end date (`YYYY-MM-DD.md`), in a per-domain subfolder:
+- `/Users/i.lurie/claude-tasks/weeklybrief/marketing/{YYYY-MM-DD}.md`
+- `/Users/i.lurie/claude-tasks/weeklybrief/dnd/{YYYY-MM-DD}.md`
 
-Create `/Users/i.lurie/claude-tasks/weeklybrief/` if it does not exist (`mkdir -p`) before the
-first write. Each base file gets a title header on creation; thereafter append only,
-never overwrite.
+Create `/Users/i.lurie/claude-tasks/weeklybrief/marketing/` and `.../dnd/` if they do not exist (`mkdir -p`) before writing. If a file for that date already exists (a re-run), overwrite it — one canonical file per week.
 
-Use the **structured append format** in `references/brief-format.md` (dated `##` header per week, one pipe-delimited record per item with fixed fields). This keeps the base human-readable *and* machine-parseable, so "show me everything on AI search since March" is a reliable grep or clean re-read. Create the file with a title header if it doesn't exist yet; never overwrite — always append.
+Use the **dated-file format** in `references/brief-format.md` (one pipe-delimited record per item with fixed fields, under cluster headings). Filename is the date, so no in-file date header is needed. The fixed pipe fields keep each file human-readable *and* machine-parseable, so "show me everything on AI search since March" stays a reliable grep across the folder.
 
 ### 7. Report
 
-Show the user both briefs in the conversation. Note any "needs routing" items and propose routing-map additions. Surface any **"new client?"** candidates found in Otter and ask whether to add them to `client-list.md`. Confirm both base files were appended to.
+Show the user both briefs in the conversation. Note any "needs routing" items and propose routing-map additions. Surface any **"new client?"** candidates found in Otter and ask whether to add them to `client-list.md`. Confirm both dated files were written, with their paths.
 
 ## References
 
 - [Routing rules](references/routing-rules.md): source→domain map and routing logic
 - [Ranking heuristics](references/ranking-heuristics.md): per-domain signal scoring
 - [Client flagging](references/client-flagging.md): matching marketing stories to client transcripts in Otter
-- [Brief format](references/brief-format.md): brief structure and the structured base append format
+- [Brief format](references/brief-format.md): brief structure and the dated per-brief file format
 - [Phase two: inbox](references/phase-two-inbox.md): how to add the email inbox as a second source later
