@@ -1,6 +1,6 @@
 ---
 name: weeklybrief
-version: 1.0.0
+version: 1.2.0
 description: When the user wants their weekly reading digest from Readwise Reader — staying on top of new developments in marketing/SEO/AI and in Dungeons & Dragons. Triggers include "run my weekly brief," "industry brief," "what did I miss this week," "catch me up on my feeds," or "weekly digest." Produces two separate briefs (marketing and D&D) from one Reader pull and writes each to its own dated Markdown file.
 ---
 
@@ -31,6 +31,8 @@ One ranker cannot serve both honestly. Keep them separate end to end: separate c
 
 Call `reader_list_documents` with `updated_after` = (today − 7 days, ISO 8601), `limit` 100, and lean `response_fields`: `title, author, source, category, location, tags, site_name, word_count, reading_time, published_date, summary, url, source_url, saved_at`. Paginate with `page_cursor` if `nextPageCursor` is returned.
 
+**Explode aggregator newsletters.** Some emails are curated link roundups, not single articles — SEOFOMO and MarketingFOMO today (the maintained list lives in `references/routing-rules.md`). For each item matching an aggregator, fetch its full body (`reader_list_documents` with that document `id` and `html_content` in `response_fields`) and extract every linked article as its own candidate item: destination URL, title, and the curator's one-line blurb, attributed `via {newsletter}`. Skip utility/sponsor/social/unsubscribe links and the newsletter's own nav. **Do not** surface the newsletter shell as its own item once exploded. Dedupe extracted articles against everything else by destination URL; when the same article shows up in an aggregator and elsewhere (or in two aggregators), keep one item but record each appearance as an independent source for convergence.
+
 ### 2. Route each item to a domain
 
 Assign every item to `marketing`, `dnd`, or `drop`. Routing is primarily **source-based** — see `references/routing-rules.md` for the maintained source→domain map. For sources not in the map, fall back to content similarity against the domain descriptions (marketing keywords vs. D&D keywords in title + summary).
@@ -45,6 +47,7 @@ Assign every item to `marketing`, `dnd`, or `drop`. Routing is primarily **sourc
 - Cluster items by topic. Group items covering the same development into one cluster.
 - Score each cluster's signal using the heuristic in `references/ranking-heuristics.md`: convergence (primary — how many independent sources), the user's own saves (weighted up), recency-of-development vs. recency-of-coverage, and relevance to the user's work (SEO, content strategy, AI-in-marketing, agentic tooling).
 - Order clusters by signal, highest first.
+- **Aggregator-extracted articles** (from step 1) count equal to feed/blog items — each curator appearance is an independent source for convergence. But only **surface** an extracted article if it converges with another source *or* is highly relevant to the user's work; otherwise drop it. Extraction is for signal detection, not a link dump.
 
 **D&D:**
 - Do **not** force convergence clustering. Treat items mostly as individual pieces.
