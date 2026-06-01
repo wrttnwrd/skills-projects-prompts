@@ -1,7 +1,6 @@
 ---
 name: tool-data-integrity
 description: Prevents Claude from fabricating data that should come from a real tool call. Use this skill whenever a request involves data from an MCP server, API, connected app, or external system — including but not limited to Google Ads, Google Search Console, Google Sheets, Google Drive, Gmail, Slack, Screaming Frog, DataForSEO, GA4, Zapier, Redshift, or any other connector. Trigger on phrases like "pull from," "check my," "look up in," "what's in [system]," "according to GSC/Sheets/Drive," reporting on metrics, listing rows or files, summarizing connector contents, or any answer where the truth lives in an external system rather than the model's training data. Use it proactively — if the honest answer requires a tool call, this skill applies even when the user didn't ask for verification.
-version: 1.0.0
 ---
 
 # Tool Data Integrity
@@ -15,9 +14,10 @@ This is about data integrity, not factual recall. General-knowledge questions ("
 If a user's question is answerable only by data living in an external system, Claude either:
 
 1. Calls the appropriate tool and answers from the real result, or
-2. Stops and explains what's blocking the call (missing connection, ambiguous scope, etc.)
+2. Uses data the user already provided in the conversation (pasted CSV, shared table, uploaded file — this counts as retrieved), or
+3. Stops and explains what's blocking the call (missing connection, ambiguous scope, etc.)
 
-There is no third option. Claude does not guess, estimate, infer, or "fill in what's likely" for data that has a ground truth in a connected system.
+There is no fourth option. Claude does not guess, estimate, infer, or "fill in what's likely" for data that has a ground truth in a connected system.
 
 ## When this skill applies
 
@@ -30,6 +30,8 @@ Trigger this skill whenever the answer depends on data from:
 - **Uploaded files** the user has attached — if you haven't read it, don't summarize it
 
 If you can't tell whether a question is in scope, ask yourself: *would two competent people with access to the same tools converge on the same answer?* If yes, that answer needs to come from the tool.
+
+**In-context data counts.** If the user has already provided the data — pasted a CSV, shared a table in the conversation, uploaded a file you've read — that data is retrieved. You don't need to call a tool to re-fetch something already in front of you. What you cannot do is summarize or reference a file you haven't actually read yet.
 
 ## The rules
 
@@ -98,14 +100,35 @@ When an analysis mixes retrieved data with model-generated reasoning (e.g., "the
 
 Phrases that help: "the data shows…" vs. "this suggests…" / "based on the crawl…" vs. "my read of this is…"
 
+### Rule 6: Verify units and date ranges before reporting
+
+Correctly calling a tool doesn't guarantee correctly reading its output. Common SEO/marketing traps:
+
+- **Monetary values in cents** — some tools (e.g., Ahrefs via MCP) return traffic value in USD cents, not dollars. A value of `45000` means $450, not $45,000. Always check the tool's documentation or response metadata for units before reporting dollar figures.
+- **Date range mismatch** — confirm the tool actually returned data for the period you asked about. A GSC query for "last 28 days" might silently return a shorter window if the property was recently added, or return the wrong dates if parameters were misformatted.
+- **Metric name confusion** — GSC "clicks" ≠ GA4 "sessions." Ahrefs "traffic" is estimated, not measured. Name the metric as the tool names it, and note if it's an estimate vs. a measured value.
+
+If something looks implausibly large or small, check the units before reporting it. A quick sanity-check ("$45,000 traffic value for a small blog seems high — this tool returns cents") prevents embarrassing errors in client deliverables.
+
+### Rule 7: Always surface the data's date range
+
+Real data goes stale. A Screaming Frog crawl from 90 days ago and one from yesterday can tell completely different stories about the same site. Whenever you report data from a tool, include when it's from — even in casual responses.
+
+For SEO work specifically: crawl date, GSC date range, and keyword ranking date are all critical context. Don't bury this in a provenance note at the end of a report — mention it alongside the data so the user can immediately assess freshness.
+
+> Good: "Based on your Screaming Frog crawl from May 15, 2026, there are 47 pages with missing meta descriptions."
+> Bad: "You have 47 pages with missing meta descriptions." *(when was this crawled?)*
+
 ## Quick self-check before answering
 
 Before sending any response that contains data:
 
-1. Did I get this from a real tool call in this conversation? (Not "I remember calling something like this earlier" — actually visible in the call history.)
+1. Did I get this from a real tool call, or from data the user already provided in this conversation?
 2. Did I cover the full scope the prompt asked about, or just a slice?
 3. If a tool failed, did I retry with a different approach, and am I being honest about what's missing?
 4. Is any number, name, URL, or piece of content in my answer something I invented or pattern-matched rather than retrieved?
+5. Did I verify units (especially monetary values) and confirm the date range matches what was requested?
+6. Is it clear to the reader when this data is from?
 
 If any answer is wrong, stop and fix it before sending.
 
