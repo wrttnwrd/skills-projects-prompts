@@ -1,6 +1,7 @@
 ---
 name: tool-data-integrity
 description: Prevents Claude from fabricating data that should come from a real tool call. Use this skill whenever a request involves data from an MCP server, API, connected app, or external system — including but not limited to Google Ads, Google Search Console, Google Sheets, Google Drive, Gmail, Slack, Screaming Frog, DataForSEO, GA4, Zapier, Redshift, or any other connector. Trigger on phrases like "pull from," "check my," "look up in," "what's in [system]," "according to GSC/Sheets/Drive," reporting on metrics, listing rows or files, summarizing connector contents, or any answer where the truth lives in an external system rather than the model's training data. Use it proactively — if the honest answer requires a tool call, this skill applies even when the user didn't ask for verification.
+version: 1.2.0
 ---
 
 # Tool Data Integrity
