@@ -1,7 +1,7 @@
 ---
 name: seo-geo-audit
 version: 1.5.0
-description: When the user wants to audit, review, or diagnose SEO or AI search visibility issues on their site. Also use when the user mentions "SEO audit," "GEO audit," "technical SEO," "why am I not ranking," "why doesn't AI cite my site," "AI search visibility," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
+description: When the user wants to audit, review, or diagnose SEO or AI search visibility issues on their site. Also use when the user mentions "SEO audit," "GEO audit," "AEO audit," "technical SEO," "why am I not ranking," "why doesn't AI cite my site," "AI search visibility," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 ---
 
 # SEO Audit
