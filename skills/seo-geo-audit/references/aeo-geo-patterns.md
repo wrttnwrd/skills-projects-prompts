@@ -309,7 +309,7 @@ Dated, attributed content outperforms undated, anonymous content in selection â€
 
 ## Retrieval Simulation Method
 
-How to test whether content actually surfaces for its target queries. The seo-audit skill's `scripts/retrieval_sim.py` implements the mechanics with local sentence-transformers embeddings.
+How to test whether content actually surfaces for its target queries. The seo-geo-audit skill's `scripts/retrieval_sim.py` implements the mechanics with local sentence-transformers embeddings.
 
 **Method:**
 

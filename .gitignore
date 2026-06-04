@@ -1,2 +1,3 @@
 projects/benchmarking-guide.md
 *.csv
+__pycache__/
