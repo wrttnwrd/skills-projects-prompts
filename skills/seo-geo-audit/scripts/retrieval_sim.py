@@ -29,9 +29,16 @@ import os
 import re
 import sys
 
-import requests
-from bs4 import BeautifulSoup
-from sentence_transformers import SentenceTransformer, util
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    from sentence_transformers import SentenceTransformer, util
+except ImportError as exc:
+    sys.exit(
+        f"Missing dependency: {exc.name}. Install with:\n"
+        "  pip install sentence-transformers beautifulsoup4 requests\n"
+        "(First run downloads the embedding model, ~80MB.)"
+    )
 
 USER_AGENT = "Mozilla/5.0 (compatible; retrieval-sim/1.0; SEO audit tool)"
 STRIP_TAGS = ["script", "style", "noscript", "nav", "footer", "header", "aside", "form"]

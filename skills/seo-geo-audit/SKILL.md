@@ -299,6 +299,7 @@ See [Keyword Cannibalization](references/keyword-cannibalization.md) for detecti
 
 Tests whether a page's content actually surfaces for its target queries when chunked and embedded the way AI retrieval systems work. Run it when the site has clear keyword targets and AI visibility matters, or when pages rank in traditional search but never get cited by AI assistants.
 
+- Before first use, confirm dependencies are installed (`pip install sentence-transformers beautifulsoup4 requests`). If they're missing, ask the user before installing — the embedding model download is ~80MB
 - Run `scripts/retrieval_sim.py` with page URLs and target queries; it chunks each page, embeds chunks with a local model, and scores cosine similarity per chunk-query pair, writing results to CSV
 - Interpret scores relatively — compare across the site's own pages rather than treating thresholds as absolute. As a starting point: best-chunk similarity below ~0.5 suggests the page is invisible to retrieval for that query; 0.5–0.65 is weak (review chunk structure); above 0.65 is competitive
 - For pages that score poorly, diagnose against the chunk-level extractability patterns in [AEO & GEO Patterns](references/aeo-geo-patterns.md) and recommend specific rewrites
