@@ -223,6 +223,128 @@ Evidence supporting this includes:
 
 ---
 
+## Chunk-Level Extractability
+
+AI search systems select content at the chunk/passage level, not the page level. A page "ranks" in generative search when individual chunks survive retrieval and selection. These patterns make chunks extractable.
+
+### Self-Contained Chunk Pattern
+
+Write every paragraph, bullet, and table row as if it could stand alone as an answer.
+
+- One complete idea per paragraph
+- No orphaned pronouns — restate the entity ("Google Search Console shows..." not "It shows..." or "This tool shows...")
+- A concise heading before each content block, so models can group related information
+- Short sentences, tight paragraphs
+
+The Self-Contained Answer Block pattern above is the template form of this rule.
+
+### Scope Statement Pattern
+
+Lead chunks with conditions of applicability. Scoped advice survives selection; vague advice gets dropped.
+
+```markdown
+[Scope condition]. [Advice/claim that applies within that scope].
+```
+
+**Example:**
+
+```markdown
+For sites with more than 200 indexed pages on related topics, semantic similarity analysis is the most reliable way to detect cannibalization. Smaller sites can rely on a manual title and H1 review.
+```
+
+### Evidence Density Rule
+
+Selection systems measure the proportion of meaningful, verifiable information to total tokens. Fact-forward chunks survive; anecdote-heavy chunks get dropped.
+
+- Lead with facts, data, and direct answers; put stories and context after
+- Use concrete numbers ("85 percent") over vague quantifiers ("most")
+- Use full dates ("April 2024") over relative phrases ("recently")
+- Put citations inside the chunk, not in a references footer
+
+### Entity-Rich Writing Pattern
+
+Clear entities strengthen how content maps into vector space and supports named entity recognition.
+
+- Pick one term per concept and use it consistently throughout
+- Use precise named entities over generic references ("Screaming Frog" not "the crawler")
+- Write subject-predicate-object statements: "Paris is located in France"
+- Add modifiers that disambiguate similar entities (size, function, location, purpose)
+
+---
+
+## Query Fan-Out and Intent-Complete Coverage
+
+Generative search decomposes a single query into 15–20 subqueries — narrowed variants, format variations, and anticipated follow-ups — then routes each to preferred sources and formats. You can't optimize one page for one query; you optimize for the branches of the fan-out.
+
+### Intent-Complete Hub Pattern
+
+Cover the core question plus the adjacent intents the system will generate:
+
+- **Narrowed variants**: audience, skill level, timeframe, budget segments of the core topic
+- **Implicit slots**: prerequisites, duration, cost, safety considerations the user didn't state but needs
+- **Anticipated follow-ups**: the natural next questions after the core answer
+
+**Example:** a half-marathon training guide should cover the schedule (table), gear (list), injury prevention, nutrition, and pacing — each in its own extractable section — because the fan-out generates subqueries for all of them.
+
+### Multimodal Parity
+
+The system routes some subqueries to specific formats. If it prefers a table for a subquery and you only have prose, you're invisible to that branch.
+
+- Present key data in tables and lists, not only narrative
+- Provide transcripts for video content
+- Expose data from interactive tools as crawlable text or structured data
+
+---
+
+## Freshness and Attribution Signals
+
+Dated, attributed content outperforms undated, anonymous content in selection — especially in volatile domains.
+
+- Explicit publication and "last reviewed" dates on the page
+- Full dates inside the content where claims are time-sensitive
+- Author name and credentials near the content, not only on a bio page
+- Version markers for anything that changes (tools, prices, specs)
+
+---
+
+## Retrieval Simulation Method
+
+How to test whether content actually surfaces for its target queries. The seo-audit skill's `scripts/retrieval_sim.py` implements the mechanics with local sentence-transformers embeddings.
+
+**Method:**
+
+1. Chunk each page the way retrieval systems do — split at headings, group paragraphs into ~200-word units
+2. Embed chunks and target queries with the same model
+3. Compute cosine similarity for every chunk-query pair
+4. For each page-query pair, the best-chunk score is the signal: it represents the page's strongest candidate for retrieval
+
+**Interpretation:**
+
+- Scores are relative to the embedding model — always compare across the site's own pages rather than treating thresholds as absolute
+- As starting points with all-MiniLM-L6-v2: best chunk below ~0.5 = likely invisible to retrieval for that query; 0.5–0.65 = weak; above 0.65 = competitive
+- A page that scores well overall but has no single strong chunk is a chunking problem: the answer is smeared across paragraphs instead of concentrated in one extractable unit
+- A page with one strong chunk buried below weak ones may still work — but check that the strong chunk is self-contained when read alone
+
+**Remediation:** rewrite the weakest high-priority pages using the Chunk-Level Extractability patterns above, then re-run the simulation to confirm improvement.
+
+---
+
+## Extractability QA Checklist
+
+- Every paragraph expresses one complete idea
+- Chunks function independently — no orphaned pronouns or ambiguous references
+- Specific data points included (percentages, full dates, metrics)
+- Named entities used consistently throughout
+- Scope statements define who/when the advice applies to
+- Tables, lists, and structured formats used where data allows
+- Citations appear inside chunks, near the claims they support
+- Headings describe the content block that follows
+- Author credentials and dates visible on the page
+- Schema markup applied honestly and comprehensively
+- Video content has transcripts; interactive tools expose crawlable data
+
+---
+
 ## Domain-Specific GEO Tactics
 
 Different content domains benefit from different authority signals.

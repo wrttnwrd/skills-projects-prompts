@@ -1,6 +1,6 @@
 ---
 name: seo-audit
-version: 1.4.0
+version: 1.5.0
 description: When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions "SEO audit," "technical SEO," "why am I not ranking," "SEO issues," "on-page SEO," "meta tags review," or "SEO health check." For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.
 ---
 
@@ -49,7 +49,6 @@ If you don't clearly understand answers to these questions, ask. Don't assume �
 
 If MCP tools are available, prefer them over manual choices. That includes Screaming Frog MCP and Google Search Console MCP.
 
-
 ---
 
 ## Technical SEO Audit
@@ -87,11 +86,21 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 - Ensure critical content is not hidden behind user interactions that Googlebot can't perform (e.g., click, scroll)
 - Check for "load more" automatic content loading that may not be crawlable
 
-**Agent And Crawler Readiness**
+**Agent and AI Crawler Readiness**
+
+*Browsing agents (Operator, computer-use agents):*
+
 - cursor:pointer in CSS for clickable elements
 - for attribute on <label> tags
 - uses semantic HTML where possible (e.g., <nav>, <main>, <article>)
 - ARIA roles where necessary for dynamic content
+
+*AI retrieval crawlers (GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot, Google-Extended):*
+
+- robots.txt allows/blocks for AI user-agents are deliberate decisions, not accidents
+- Critical content available without JS execution (AI crawlers are stricter than Googlebot — most don't render JS at all)
+- Chunk extractability spot-check: headings before content blocks, one idea per paragraph, no orphaned pronouns, data in tables/lists, scope statements, explicit dates (see [AEO & GEO Patterns](references/aeo-geo-patterns.md))
+- AI crawler hits in server logs, if available
 
 ### Indexation
 
@@ -251,6 +260,7 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 - Logical link relationships
 - No broken internal links
 - Reasonable link count per page
+- Nofollow not used (unless justified)
 
 **Common issues:**
 - Orphan pages (no internal links)
@@ -277,56 +287,21 @@ If MCP tools are available, prefer them over manual choices. That includes Screa
 Cannibalization happens when multiple pages on the same site compete for the same query, splitting authority and click signals. It's often invisible without deliberate analysis — the symptom is pages that rank but never quite *win*, or rankings that flip between URLs week to week.
 
 **When to run this analysis**
+
 - Site has more than ~50 indexed pages on related topics
 - Multiple pages targeting overlapping keywords (common in SaaS, publishing, content-heavy sites)
 - GSC shows multiple URLs ranking for the same query
 - Rankings are unstable or stuck on page 2
 
-**Detection methods, in order of rigor**
+See [Keyword Cannibalization](references/keyword-cannibalization.md) for detection methods (GSC query-to-page, title/H1 overlap, semantic similarity), severity scoring, remediation options, and deliverables.
 
-1. **GSC query-to-page check (fastest signal)**
-   - Pull GSC performance data grouped by query, then by page
-   - Flag any query where 2+ URLs have impressions above a meaningful threshold (e.g., >50/month)
-   - Flag queries where the top-ranking URL changes across recent date ranges
-   - Use `gscServer:get_search_by_page_query` if MCP is available
+### Retrieval Simulation (AI Search)
 
-2. **Title/H1 overlap check (cheap, catches obvious cases)**
-   - Crawl the site and extract title tags and H1s
-   - Look for near-duplicate phrasing across URLs
-   - Manual review or simple string-similarity scoring (Jaccard, fuzzy match)
+Tests whether a page's content actually surfaces for its target queries when chunked and embedded the way AI retrieval systems work. Run it when the site has clear keyword targets and AI visibility matters, or when pages rank in traditional search but never get cited by AI assistants.
 
-3. **Semantic similarity analysis (most rigorous, recommended for libraries >200 pages)**
-   - Generate embeddings for each page's primary content (title + H1 + first 500 words, or full body if scoped)
-   - Compute pairwise cosine similarity across the corpus
-   - Flag pairs above a similarity threshold (typically 0.85+ for clear cannibalization risk; 0.70–0.85 for review)
-   - Visualize as a heatmap or ranked pair list to make patterns legible
-   - Cross-reference high-similarity pairs against GSC to confirm they're competing for the same queries (similarity alone isn't cannibalization — two pages can be semantically close but serve different intents)
-
-**Severity scoring**
-
-For each flagged pair, score severity using:
-- **Similarity score** (semantic or query-overlap percentage)
-- **Traffic stakes** (combined impressions/clicks of the competing URLs)
-- **Intent alignment** (do they actually serve the same user need, or is the overlap superficial?)
-- **Backlink distribution** (is authority split, or concentrated on one URL?)
-
-A high-severity case looks like: two URLs >85% similar, both getting meaningful GSC impressions on shared queries, both targeting the same intent, with backlinks split between them.
-
-**Remediation options, by severity**
-
-| Severity | Likely fix |
-|---|---|
-| High — same intent, high overlap | Consolidate: merge content, 301 the weaker URL to the stronger, update internal links |
-| Medium — similar topic, distinguishable intent | Differentiate: rewrite to clarify each page's unique angle, retarget keywords, adjust internal anchor text |
-| Low — surface overlap only | Monitor: tighten titles/H1s, leave structure alone |
-
-Consolidation is usually the right call when traffic is small or evenly split. Differentiation is right when both pages have meaningful traffic from distinct queries and the overlap is fixable through editing.
-
-**What to deliver**
-
-- Ranked list of cannibalization pairs with similarity score, combined traffic, and recommended action
-- For high-severity pairs: specific consolidation or differentiation plan, including target URL, redirect map if applicable, and internal link updates needed
-- Heatmap or matrix visualization for libraries large enough to warrant it (>200 pages)
+- Run `scripts/retrieval_sim.py` with page URLs and target queries; it chunks each page, embeds chunks with a local model, and scores cosine similarity per chunk-query pair, writing results to CSV
+- Interpret scores relatively — compare across the site's own pages rather than treating thresholds as absolute. As a starting point: best-chunk similarity below ~0.5 suggests the page is invisible to retrieval for that query; 0.5–0.65 is weak (review chunk structure); above 0.65 is competitive
+- For pages that score poorly, diagnose against the chunk-level extractability patterns in [AEO & GEO Patterns](references/aeo-geo-patterns.md) and recommend specific rewrites
 
 ---
 
@@ -362,6 +337,11 @@ Consolidation is usually the right call when traffic is small or evenly split. D
 - Time on page
 - Engagement rate
 - Key event rates (e.g., scroll depth, clicks)
+
+**AI Search Visibility Signals**
+- AI referral traffic (chatgpt.com, perplexity.ai, gemini.google.com, copilot.microsoft.com referrers in GA)
+- Branded search volume or direct traffic lift following AI citations
+- Spot-check citation share of voice: run priority queries through AI assistants and note whether (and where) the site is cited
 
 ### Content Depth
 
@@ -445,7 +425,8 @@ Same format as above
 ## References
 
 - [AI Writing Detection](references/ai-writing-detection.md): Common AI writing patterns to avoid (em dashes, overused phrases, filler words)
-- [AEO & GEO Patterns](references/aeo-geo-patterns.md): Content patterns optimized for answer engines and AI citation
+- [AEO & GEO Patterns](references/aeo-geo-patterns.md): Content patterns optimized for answer engines and AI citation, including chunk-level extractability and query fan-out coverage
+- [Keyword Cannibalization](references/keyword-cannibalization.md): Detection methods, severity scoring, and remediation for pages competing on the same queries
 
 ---
 

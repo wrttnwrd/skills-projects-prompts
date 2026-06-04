@@ -1,6 +1,6 @@
 ---
 name: weeklybrief
-version: 1.2.0
+version: 1.4.0
 description: When the user wants their weekly reading digest from Readwise Reader — staying on top of new developments in marketing/SEO/AI and in Dungeons & Dragons. Triggers include "run my weekly brief," "industry brief," "what did I miss this week," "catch me up on my feeds," or "weekly digest." Produces two separate briefs (marketing and D&D) from one Reader pull and writes each to its own dated Markdown file.
 ---
 
@@ -29,7 +29,9 @@ One ranker cannot serve both honestly. Keep them separate end to end: separate c
 
 ### 1. Pull the week from Reader
 
-Call `reader_list_documents` with `updated_after` = (today − 7 days, ISO 8601), `limit` 100, and lean `response_fields`: `title, author, source, category, location, tags, site_name, word_count, reading_time, published_date, summary, url, source_url, saved_at`. Paginate with `page_cursor` if `nextPageCursor` is returned.
+Call `reader_list_documents` with `updated_after` = (today − 8 days, ISO 8601; a 1-day buffer so nothing at the boundary is missed), `limit` 100, and lean `response_fields`: `title, author, source, category, location, tags, site_name, word_count, reading_time, published_date, summary, url, source_url, saved_at`. Paginate with `page_cursor` if `nextPageCursor` is returned.
+
+**Include both seen and unseen items — do not pass a `seen` filter.** The daily inbox digest marks items `seen` as it surfaces them; the weekly is a week-in-review and must still include those. Then keep only items whose `saved_at` falls within the **previous 7 days** — a rolling window ending today (today − 7 days through now), NOT a fixed calendar week. Scope by `saved_at`, not by `updated_at`: marking an item seen bumps its updated time, so keying on `saved_at` is what keeps the daily's seen-marking from dragging an older item into the window (or, with the buffer, dropping a recent one).
 
 **Explode aggregator newsletters.** Some emails are curated link roundups, not single articles — SEOFOMO and MarketingFOMO today (the maintained list lives in `references/routing-rules.md`). For each item matching an aggregator, fetch its full body (`reader_list_documents` with that document `id` and `html_content` in `response_fields`) and extract every linked article as its own candidate item: destination URL, title, and the curator's one-line blurb, attributed `via {newsletter}`. Skip utility/sponsor/social/unsubscribe links and the newsletter's own nav. **Do not** surface the newsletter shell as its own item once exploded. Dedupe extracted articles against everything else by destination URL; when the same article shows up in an aggregator and elsewhere (or in two aggregators), keep one item but record each appearance as an independent source for convergence.
 
