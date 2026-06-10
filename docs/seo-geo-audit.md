@@ -39,9 +39,7 @@ The audit is only as good as its inputs. Have these ready:
 ## Example Invocations
 
 ```text
-Run an SEO audit on example.com. Here's my Screaming Frog export:
-crawl/internal_html.csv. My priority keywords and target pages are in
-keywords.md. I have GSC access via MCP.
+Run an SEO audit on example.com. The screaming frog export is available via MCP at that domain. My priority keywords and target pages are in keyword-page-map.md. I have GSC access via MCP.
 ```
 
 ```text
